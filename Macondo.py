@@ -1153,7 +1153,7 @@ def main():
         st.markdown('---')
         st.header('Buscar Dados')
         st.markdown('---')
-        busca_dados()
+        #busca_dados()
     elif funcao == 'Análise de Dados':
         st.markdown('---')
         st.header('Análise de Dados')
