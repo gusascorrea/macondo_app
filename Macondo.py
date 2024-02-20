@@ -16,6 +16,15 @@ def olx(pags, url, df_antigo):
     import requests
     from bs4 import BeautifulSoup
 
+    import os
+
+    @st.experimental_singleton
+    def install_chromedriver():
+        os.system('sbase install chromedriver')
+        os.system('ln -s /home/appuser/venv/lib/python3.9/site-packages/seleniumbase/drivers/chromedriver /home/appuser/venv/bin/chromedriver')
+
+    _ = install_chromedriver()
+
     from selenium import webdriver
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import Select
@@ -1135,7 +1144,7 @@ def main():
     with col2:
         st.title('Macondo')
 
-    func = ['Início', 'Buscar Dados',
+    func = ['Início', #'Buscar Dados',
             'Análise de Dados',
             'Disponibilidade de Anúncios']
     funcao = st.sidebar.radio('Seção', func)

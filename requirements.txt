@@ -3,7 +3,7 @@ numpy
 streamlit
 requests
 bs4
-selenium
+seleniumbase
 datetime
 plotly
 seaborn
