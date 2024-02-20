@@ -1,0 +1,11 @@
+pandas
+numpy
+streamlit
+requests
+bs4
+selenium
+datetime
+plotly
+seaborn
+matplotlib
+scikit-learn
