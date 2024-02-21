@@ -1144,7 +1144,7 @@ def main():
     with col2:
         st.title('Macondo')
 
-    func = ['Início', #'Buscar Dados',
+    func = ['Início', 'Buscar Dados',
             'Análise de Dados',
             'Disponibilidade de Anúncios']
     funcao = st.sidebar.radio('Seção', func)
@@ -1153,7 +1153,7 @@ def main():
         st.markdown('---')
         st.header('Buscar Dados')
         st.markdown('---')
-        #busca_dados()
+        busca_dados()
     elif funcao == 'Análise de Dados':
         st.markdown('---')
         st.header('Análise de Dados')
