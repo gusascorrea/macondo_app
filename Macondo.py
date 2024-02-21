@@ -76,7 +76,7 @@ def dispersao(filtered_df):
     filtered_df['Previsões'] = predictions
 
     # Calculando os erros (resíduos)
-    errors = y - predictions
+    errors = z - predictions
     filtered_df['Erro do Modelo'] = errors
 
     # Criando o gráfico de dispersão com Plotly
