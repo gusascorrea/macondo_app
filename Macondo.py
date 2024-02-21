@@ -65,9 +65,9 @@ def dispersao(filtered_df):
 
     # Criando o modelo de regressão linear
     X = filtered_df[[x]]
-    y = filtered_df[y]
+    z = filtered_df[y]
     model = LinearRegression()
-    model.fit(X, y)
+    model.fit(X, z)
 
     # Fazendo previsões
     predictions = model.predict(X)
