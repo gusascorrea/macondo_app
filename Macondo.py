@@ -57,12 +57,31 @@ def dispersao(filtered_df):
         x = st.selectbox('Argumento X:', ['Area', 'Quartos','Banheiros', 'Vagas','Preco', 'Preco_por_m2'])
 
     with col2:
-        y = st.selectbox('Argumento Y:', ['Preco', 'Preco_por_m2'])
+        y = st.selectbox('Argumento Y:', ['Preco', 'Preco_por_m2', 'Area', 'Quartos', 'Banheiros'])
 
     cor = st.selectbox('Coloração por:', ['Regiao', 'Bairro', 'Quartos','Banheiros', 'Vagas', 'Erro do Modelo'])
 
-    # Modelo de Regressão Linear
+    st.markdown('---')
 
+    # Correlação
+    corr = filtered_df[x].corr(filtered_df[y])
+
+    # Exibir o resultado
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(f'Correlação linear entre {x} e {y}:',value = round(corr,2))  
+    
+    with col2:
+        # Exibir o indicador de acordo com o valor da correlação
+        if corr > 0.7:
+            st.success('Correlação Forte')
+        elif 0.5 <= corr <= 0.7:
+            st.warning('Correlação Moderada')
+        else:
+            st.error('Correlação Fraca')
+    
+    # Modelo de Regressão Linear
+    
     # Criando o modelo de regressão linear
     X = filtered_df[[x]]
     z = filtered_df[y]
