@@ -359,7 +359,7 @@ def main():
             histogramas(filtered_df)
         else:
             st.markdown('---')
-            st.write('Aplicativo designado à busca e análise de anúncios de imóveis.')
+            st.write('Aplicativo designado à análise de anúncios de imóveis.')
 
 
 main()
