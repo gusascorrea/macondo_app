@@ -204,7 +204,7 @@ def histogramas(filtered_df):
     import plotly.graph_objects as go
     import seaborn as sns
     import matplotlib.pyplot as plt
-    from scipy.stats import skew
+    from scipy.stats import skew, kurtosis
     from sklearn.linear_model import LinearRegression
 
     x = st.selectbox('Argumento X:', ['Preco','Preco_por_m2', 'Area', 'Quartos','Banheiros', 'Vagas'])
@@ -222,7 +222,12 @@ def histogramas(filtered_df):
     # Skewness
     skew_df_hist = skew(df_hist)
 
+    # Curtosis
+    curtosis_df_hist = kurtosis(df_hist)
+
     # Média e Mediana para 'x'
+
+    st.markdown('---')
 
     col1, col2, col3 = st.columns(3)
 
@@ -233,7 +238,6 @@ def histogramas(filtered_df):
 
     with col1:
         st.metric('Média',round(mean_x,0))
-        st.metric('Skewness', round(skew_df_hist,2))
 
     with col2:
         st.metric('Mediana',round(median_x,0))
@@ -241,7 +245,13 @@ def histogramas(filtered_df):
     with col3:
         st.metric('Desvio Padrão', round(std_x,0))
 
-    
+    col1, col2,col3,col4,col5 = st.columns(5)
+
+    with col2:
+        st.metric('Skewness', round(skew_df_hist,2))
+
+    with col4:
+        st.metric('Curtosis', round(curtosis_df_hist,2))
 
     # Criando a figura para o primeiro histograma (Preco_por_m2)
     fig1 = go.Figure(data=[histogram_preco_por_m2])
@@ -251,6 +261,10 @@ def histogramas(filtered_df):
         color="black", width=2, dash='dash'), name="Média")
     fig1.add_vline(x=median_x, line=dict(
         color="darkgrey", width=2, dash='dash'), name="Mediana")
+    fig1.add_vline(x=mean_x + std_x, line=dict(
+        color="blue", width=2, dash='dash'), name="Mediana")
+    fig1.add_vline(x=mean_x - std_x, line=dict(
+        color="blue", width=2, dash='dash'), name="Mediana")
 
     fig1.update_layout(
         title=f'Histograma de {x}',
