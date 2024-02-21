@@ -8,4 +8,5 @@ datetime
 plotly
 seaborn
 matplotlib
+scipy
 scikit-learn

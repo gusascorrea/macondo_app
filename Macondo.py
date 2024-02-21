@@ -204,21 +204,44 @@ def histogramas(filtered_df):
     import plotly.graph_objects as go
     import seaborn as sns
     import matplotlib.pyplot as plt
+    from scipy.stats import skew
     from sklearn.linear_model import LinearRegression
 
     x = st.selectbox('Argumento X:', ['Preco','Preco_por_m2', 'Area', 'Quartos','Banheiros', 'Vagas'])
 
-    # Criando o histograma para 'Preco_por_m2'
+    df_hist = filtered_df[x].dropna()
+
+    # Criando o histograma para 'x'
     histogram_preco_por_m2 = go.Histogram(
-        x=filtered_df[x],
+        x=df_hist,
         histnorm='probability',
         name=f'{x} Histogram',
         marker=dict(color='#800000')
     )
 
-    # Média e Mediana para 'Preco_por_m2'
-    mean_x = filtered_df[x].mean()
-    median_x = filtered_df[x].median()
+    # Skewness
+    skew_df_hist = skew(df_hist)
+
+    # Média e Mediana para 'x'
+
+    col1, col2, col3 = st.columns(3)
+
+
+    mean_x = df_hist.mean()
+    median_x = df_hist.median()
+    std_x = df_hist.std()
+
+    with col1:
+        st.metric('Média',round(mean_x,0))
+        st.metric('Skewness', round(skew_df_hist,2))
+
+    with col2:
+        st.metric('Mediana',round(median_x,0))
+
+    with col3:
+        st.metric('Desvio Padrão', round(std_x,0))
+
+    
 
     # Criando a figura para o primeiro histograma (Preco_por_m2)
     fig1 = go.Figure(data=[histogram_preco_por_m2])
