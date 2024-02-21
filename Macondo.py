@@ -248,10 +248,10 @@ def histogramas(filtered_df):
     col1, col2,col3,col4,col5 = st.columns(5)
 
     with col2:
-        st.metric('Skewness', round(skew_df_hist,2))
+        st.metric('Skewness', round(skew_df_hist,2), help = 'Medida da falta de simetria de uma determinada distribuição de frequência.')
 
     with col4:
-        st.metric('Curtosis', round(curtosis_df_hist,2))
+        st.metric('Curtosis', round(curtosis_df_hist,2), help = 'Medida de forma que caracteriza o achatamento da curva da função de distribuição de probabilidade.')
 
     # Criando a figura para o primeiro histograma (Preco_por_m2)
     fig1 = go.Figure(data=[histogram_preco_por_m2])
