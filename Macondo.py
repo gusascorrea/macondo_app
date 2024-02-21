@@ -260,7 +260,7 @@ def main():
             regioes_selecionadas)] if regioes_selecionadas else df
 
         # Filtrando por bairro
-        bairros = df['Bairro'].unique()
+        bairros = filtered_df['Bairro'].unique()
         bairros_selecionados = st.sidebar.multiselect(
             'Selecione o(s) Bairro(s)', bairros)
 
