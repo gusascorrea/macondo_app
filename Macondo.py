@@ -295,6 +295,10 @@ def main():
         elif uploaded_file.name.endswith('.xlsx'):
             df = pd.read_excel(uploaded_file, engine='openpyxl', index_col=0)
 
+        if len(df.columns) == 0:
+            df = pd.read_csv(uploaded_file, sep=',', index_col=0)
+
+
         func = ['Início',
                 'Correlação',
                 'Dispersões',
