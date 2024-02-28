@@ -251,7 +251,7 @@ def histogramas(filtered_df):
         st.metric('Skewness', round(skew_df_hist,2), help = 'Medida da falta de simetria de uma determinada distribuição de frequência.')
 
     with col4:
-        st.metric('Curtosis', round(curtosis_df_hist,2), help = 'Medida de forma que caracteriza o achatamento da curva da função de distribuição de probabilidade.')
+        st.metric('Curtose', round(curtosis_df_hist,2), help = 'Medida de forma que caracteriza o achatamento da curva da função de distribuição normal de probabilidade.')
 
     # Criando a figura para o primeiro histograma (Preco_por_m2)
     fig1 = go.Figure(data=[histogram_preco_por_m2])
@@ -309,6 +309,15 @@ def main():
         # Filtro de área na sidebar
         st.sidebar.markdown('---')
         st.sidebar.title('Filtros:')
+
+        if 'Aluguel' in uploaded_file:
+            periodo = df['Periodo Aluguel'].unique()
+            periodos_selecionadas = st.sidebar.multiselect(
+                'Selecione o(s) Período(s)', periodo)
+            # Filtrando os dados
+            filtered_df = df[df['Periodo Aluguel'].isin(
+                periodos_selecionadas)] if periodos_selecionadas else df
+
 
         # Filtrando por Região
         regioes = df['Regiao'].unique()
