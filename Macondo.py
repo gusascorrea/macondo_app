@@ -317,7 +317,7 @@ def main():
             periodos_selecionadas = st.sidebar.multiselect(
                 'Selecione o(s) Período(s)', periodo)
             # Filtrando os dados
-            filtered_df = df[df['Periodo Aluguel'].isin(
+            df = df[df['Periodo Aluguel'].isin(
                 periodos_selecionadas)] if periodos_selecionadas else df    
         else:
             pass
