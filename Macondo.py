@@ -310,6 +310,8 @@ def main():
         st.sidebar.markdown('---')
         st.sidebar.title('Filtros:')
 
+        st.sidebar.write(uploaded_file)
+
         if 'Aluguel' in uploaded_file:
             periodo = df['Periodo Aluguel'].unique()
             periodos_selecionadas = st.sidebar.multiselect(
