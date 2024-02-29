@@ -92,11 +92,11 @@ def dispersao(filtered_df):
     predictions = model.predict(X)
 
     # Adicionando as previsões ao DataFrame
-    filtered_df['Previsões'] = predictions
+    filtered_df['Previsões'] = round(predictions,0)
 
     # Calculando os erros (resíduos)
     errors = z - predictions
-    filtered_df['Erro do Modelo'] = errors
+    filtered_df['Erro do Modelo'] = round(errors,0)
 
     # Criando o gráfico de dispersão com Plotly
     fig = px.scatter(filtered_df, x=x, y=y, color=cor,
