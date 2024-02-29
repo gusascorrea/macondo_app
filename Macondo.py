@@ -288,7 +288,7 @@ def main():
         "Escolha um arquivo CSV ou Excel", type=["csv", "xlsx"])
 
     # Verifica se o arquivo foi carregado
-    if uploaded_file is not None:
+    if uploaded_file:
         # Verifica o tipo de arquivo e lê
         if uploaded_file.name.endswith('.csv'):
             df = pd.read_csv(uploaded_file, sep=';', index_col=0)
@@ -310,16 +310,17 @@ def main():
         st.sidebar.markdown('---')
         st.sidebar.title('Filtros:')
 
-        st.sidebar.write(uploaded_file)
+        tipo_anuncio = st.sidebar.selectbox('Selecione o tipo de anúncio:', ['Venda', 'Aluguel'])
 
-        if 'Aluguel' in uploaded_file:
+        if tipo_anuncio == 'Aluguel':
             periodo = df['Periodo Aluguel'].unique()
             periodos_selecionadas = st.sidebar.multiselect(
                 'Selecione o(s) Período(s)', periodo)
             # Filtrando os dados
             filtered_df = df[df['Periodo Aluguel'].isin(
-                periodos_selecionadas)] if periodos_selecionadas else df
-
+                periodos_selecionadas)] if periodos_selecionadas else df    
+        else:
+            pass
 
         # Filtrando por Região
         regioes = df['Regiao'].unique()
