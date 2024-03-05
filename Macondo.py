@@ -391,6 +391,16 @@ def main():
                                                                        min_value=min_quartos,
                                                                        max_value=max_quartos,
                                                                        value=(min_quartos, max_quartos))
+        
+        # Defina o valor mínimo e máximo de banheiros no DataFrame
+        min_banheiros = int(filtered_df['Banheiros'].min())
+        max_banheiros = int(filtered_df['Banheiros'].max())
+
+        # Crie um range slider para selecionar o intervalo de número de quartos
+        min_banheiros_selected, max_banheiros_selected = st.sidebar.slider('Número de banheiros',
+                                                                       min_value=min_banheiros,
+                                                                       max_value=max_banheiros,
+                                                                       value=(min_banheiros, max_banheiros))
 
         # Defina o valor mínimo e máximo de quartos no DataFrame
         min_vagas = int(filtered_df['Vagas'].min())
@@ -407,6 +417,7 @@ def main():
                                   & (filtered_df['Preco_por_m2'] >= min_pm2) & (filtered_df['Preco_por_m2'] <= max_pm2)
                                   & (filtered_df['Preco'] >= min_p) & (filtered_df['Preco'] <= max_p)
                                   & (filtered_df['Quartos'] >= min_quartos_selected) & (filtered_df['Quartos'] <= max_quartos_selected)
+                                  & (filtered_df['Banheiros'] >= min_banheiros_selected) & (filtered_df['Banheiros'] <= max_banheiros_selected)
                                   & (filtered_df['Vagas'] >= min_vagas_selected) & (filtered_df['Vagas'] <= max_vagas_selected)]
 
         if funcao == 'Correlação':
