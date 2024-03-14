@@ -24,7 +24,8 @@ def correlacao(filtered_df):
                           'Banheiros',
                           'Vagas',
                           'Preco',
-                          'Preco_por_m2']
+                          'Preco_por_m2',
+                          'Log_Preco']
 
     # Compute the correlation matrix
     # You can extend this to more features if needed
@@ -54,10 +55,10 @@ def dispersao(filtered_df):
     col1, col2 = st.columns(2)
 
     with col1:
-        x = st.selectbox('Argumento X:', ['Area', 'Quartos','Banheiros', 'Vagas','Preco', 'Preco_por_m2'])
+        x = st.selectbox('Argumento X:', ['Area', 'Quartos','Banheiros', 'Vagas','Preco', 'Preco_por_m2', 'Log_Preco'])
 
     with col2:
-        y = st.selectbox('Argumento Y:', ['Preco', 'Preco_por_m2', 'Area', 'Quartos', 'Banheiros'])
+        y = st.selectbox('Argumento Y:', ['Preco', 'Preco_por_m2', 'Log_Preco', 'Area', 'Quartos', 'Banheiros'])
 
     cor = st.selectbox('Coloração por:', ['Regiao', 'Bairro', 'Quartos','Banheiros', 'Vagas', 'Erro do Modelo'])
 
@@ -154,7 +155,7 @@ def medias(filtered_df):
         x = st.selectbox('Argumento X:', ['Regiao','Bairro', 'Classe', 'Area', 'Quartos','Banheiros', 'Vagas'])
 
     with col2:
-        y = st.selectbox('Argumento Y:', ['Preco', 'Preco_por_m2', 'Area', 'Quartos','Banheiros', 'Vagas'])    
+        y = st.selectbox('Argumento Y:', ['Preco', 'Preco_por_m2','Log_Preco', 'Area', 'Quartos','Banheiros', 'Vagas'])    
 
     # Calcular a média de Preço por metro quadrado e os desvios padrão por bairro
     media_x_por_y = filtered_df.groupby(
