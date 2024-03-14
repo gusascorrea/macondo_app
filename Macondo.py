@@ -208,7 +208,7 @@ def histogramas(filtered_df):
     from scipy.stats import skew, kurtosis
     from sklearn.linear_model import LinearRegression
 
-    x = st.selectbox('Argumento X:', ['Preco','Preco_por_m2', 'Area', 'Quartos','Banheiros', 'Vagas'])
+    x = st.selectbox('Argumento X:', ['Preco','Preco_por_m2', 'Log_Preco', 'Area', 'Quartos','Banheiros', 'Vagas'])
 
     df_hist = filtered_df[x].dropna()
 
@@ -276,6 +276,74 @@ def histogramas(filtered_df):
     # Organizando os gráficos na mesma linha
     st.plotly_chart(fig1, use_container_width=True)
 
+def oportunidades(filtered_df):
+    import pandas as pd
+    import numpy as np
+
+    # Importar LabelEncoder do scikit-learn
+    from sklearn.preprocessing import LabelEncoder
+
+    # Inicializar o codificador
+    le = LabelEncoder()
+
+    # Ajustar o codificador aos bairros no DataFrame
+    filtered_df['Bairro_Numerico'] = le.fit_transform(filtered_df['Bairro'])
+
+    # Visualizar os mapeamentos de bairros para valores numéricos
+    mapeamento_bairros = dict(zip(le.classes_, le.transform(le.classes_)))
+
+
+    from sklearn.model_selection import train_test_split
+    from sklearn.tree import DecisionTreeRegressor
+    from sklearn.metrics import mean_squared_error
+    from math import sqrt
+    from sklearn.model_selection import cross_val_score
+
+    # Supondo que você tenha carregado sua base de dados em um DataFrame chamado 'dados'
+    # Exemplo:
+    # dados = pd.read_csv('seu_arquivo.csv')
+
+    # Selecionando as características relevantes para a precificação
+    caracteristicas = filtered_df[['Area', 'Quartos', 'Banheiros', 'Vagas', 'Bairro_Numerico']]
+
+    # Selecionando os preços correspondentes
+    precos = filtered_df['Log_Preco']
+
+    # Dividindo os dados em conjuntos de treinamento e teste
+    X_train, X_test, y_train, y_test = train_test_split(caracteristicas, precos, test_size=0.2, random_state=42)
+
+    # Criando e treinando o modelo de árvore de decisão
+    modelo = DecisionTreeRegressor(min_samples_leaf=10)
+    modelo.fit(X_train, y_train)
+
+    # Avaliando a importância de cada variável
+    importancias = modelo.feature_importances_
+
+    # Imprimindo a importância de cada variável
+    for i, coluna in enumerate(caracteristicas.columns):
+        print(f"Importância da variável {coluna}: {importancias[i]}")
+
+    # Realizando a validação cruzada com 5 folds
+    scores = cross_val_score(modelo, caracteristicas, precos, cv=5, scoring='neg_mean_squared_error')
+
+    # Convertendo os scores de erro para RMSE
+    rmse_scores = [sqrt(abs(score)) for score in scores]
+
+    # Imprimindo os scores de RMSE
+    print("Scores de RMSE: ", rmse_scores)
+    print("RMSE Médio: ", np.mean(rmse_scores))
+
+    # Fazendo previsões
+    predictions = modelo.predict(X)
+
+    # Adicionando as previsões ao DataFrame
+    filtered_df['Previsões'] = predictions.round(0)
+
+    # Calculando os erros (resíduos)
+    errors = filtered_df['Preco'] - predictions
+    filtered_df['Erro do Modelo'] = errors.round(0)
+
+
 def main():
     col1, col2, col3 = st.columns(3)
 
@@ -304,7 +372,9 @@ def main():
                 'Correlação',
                 'Dispersões',
                 'Médias',
-                'Histogramas']
+                'Histogramas',
+                'Oportunidades']
+        
         funcao = st.sidebar.radio('Seção', func)
 
         # Filtro de área na sidebar
@@ -421,6 +491,8 @@ def main():
                                   & (filtered_df['Banheiros'] >= min_banheiros_selected) & (filtered_df['Banheiros'] <= max_banheiros_selected)
                                   & (filtered_df['Vagas'] >= min_vagas_selected) & (filtered_df['Vagas'] <= max_vagas_selected)]
 
+        filtered_df['Log_Preco'] = np.log(filtered_df.Preco)
+
         if funcao == 'Correlação':
             st.markdown('---')
             st.header('Correlação')
@@ -441,9 +513,15 @@ def main():
             st.header('Histogramas')
             st.markdown('---')
             histogramas(filtered_df)
+        elif funcao == 'Oportunidades':
+            st.markdown('---')
+            st.header('Oportunidades')
+            st.markdown('---')
+            oportunidades(filtered_df)            
         else:
             st.markdown('---')
-            st.write('Aplicativo designado à análise de anúncios de imóveis.')
+            st.subheader('Aplicativo designado à análise de anúncios de imóveis.')
+            st.write('')
 
 
 main()
