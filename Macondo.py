@@ -99,17 +99,18 @@ def dispersao(filtered_df):
     # Calculando os erros (resíduos)
     errors = z - predictions
     filtered_df['Erro do Modelo'] = errors.round(0)
+    filtered_df['ID'] = filtered_df.index
 
     # Criando o gráfico de dispersão com Plotly
     fig = px.scatter(filtered_df, x=x, y=y, color=cor,
                         title=f'Gráfico de Dispersão: {x} vs. {y}',
                         labels={
                             f'{x}': f'{x}', f'{y}': f'{y}'},
-                        hover_data={'Descricao': True},
+                        hover_data={'ID': True},
                         width=900, height=600)
 
     # Adicionando texto de descrição e link a cada ponto
-    fig.update_traces(text=filtered_df['Descricao'], hoverinfo='text')
+    fig.update_traces(text='ID', hoverinfo='text')
 
     # Definindo a ação ao clicar no ponto
     fig.update_traces(marker=dict(size=12),
@@ -137,9 +138,16 @@ def dispersao(filtered_df):
     # Mostrando o gráfico no Streamlit
     st.plotly_chart(fig)
 
+    id = st.number_input('ID:', step = 1)
+    busca_id = st.button('Buscar por ID')
+
     # Tabela com os dados
-    st.write(filtered_df[['Link', 'Area', 'Preco',
-                'Bairro', 'Previsões', 'Erro do Modelo']])
+    if busca_id:
+        st.write(filtered_df[['Link', 'Area', 'Preco',
+            'Bairro', 'Previsões', 'Erro do Modelo']].loc[filtered_df.ID == id])
+    else:
+        st.write(filtered_df[['Link', 'Area', 'Preco',
+            'Bairro', 'Previsões', 'Erro do Modelo']])
 
 def medias(filtered_df):
 
