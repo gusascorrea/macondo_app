@@ -106,16 +106,18 @@ def dispersao(filtered_df):
                         title=f'Gráfico de Dispersão: {x} vs. {y}',
                         labels={
                             f'{x}': f'{x}', f'{y}': f'{y}'},
-                        hover_data={'ID': True},
+                        hover_data={'ID': True,
+                                    'Descricao' : True},
                         width=900, height=600)
 
-    # Adicionando texto de descrição e link a cada ponto
-    fig.update_traces(text='ID', hoverinfo='text')
+    # Adicionando texto de ID a cada ponto
+    #fig.update_traces(text='ID', hoverinfo='text')
+
+    # Adicionando texto de descrição a cada ponto
+    #fig.update_traces(text='Descricao', hoverinfo='text')
 
     # Definindo a ação ao clicar no ponto
-    fig.update_traces(marker=dict(size=12),
-                        selector=dict(mode='markers'),
-                        meta={'Link': 'Link'})
+    fig.update_traces(marker=dict(size=7))
 
     # Aumentando o tamanho da fonte nos eixos x e y
     fig.update_layout(
