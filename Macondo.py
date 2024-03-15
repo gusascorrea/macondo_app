@@ -60,7 +60,7 @@ def dispersao(filtered_df):
     with col2:
         y = st.selectbox('Argumento Y:', ['Preco', 'Preco_por_m2', 'Log_Preco', 'Area', 'Quartos', 'Banheiros'])
 
-    cor = st.selectbox('Coloração por:', ['Regiao', 'Bairro','Preco Abaixo do Mercado', 'Quartos','Banheiros', 'Vagas', 'Erro do Modelo'])
+    cor = st.selectbox('Coloração por:', ['Preco Abaixo do Mercado', 'Regiao', 'Bairro', 'Quartos','Banheiros', 'Vagas', 'Erro do Modelo'])
 
     st.markdown('---')
 
