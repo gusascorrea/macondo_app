@@ -143,8 +143,6 @@ def dispersao(df):
     id = st.number_input('ID:', step = 1)
     busca_id = st.button('Buscar por ID')
 
-    st.write(df['Erro do Modelo'].std())
-
     # Tabela com os dados
     if busca_id:
         st.write(df[['Link', 'Area', 'Preco',
@@ -291,16 +289,6 @@ def histogramas(filtered_df):
     st.plotly_chart(fig1, use_container_width=True)
 
 def oportunidades(df):
-    # Importar LabelEncoder do scikit-learn
-    from sklearn.preprocessing import LabelEncoder
-
-    # Inicializar o codificador
-    le1 = LabelEncoder()
-    le2 = LabelEncoder()
-
-    # Ajustar o codificador aos bairros no DataFrame
-    df['Bairro_Numerico'] = le1.fit_transform(df['Bairro'])
-    df['Classe_Numerica'] = le2.fit_transform(df['Classe'])
 
     import pandas as pd
     import numpy as np
@@ -310,103 +298,122 @@ def oportunidades(df):
     from math import sqrt
     from sklearn.model_selection import cross_val_score
 
-    # Supondo que você tenha carregado sua base de dados em um DataFrame chamado 'dados'
-    # Exemplo:
-    # dados = pd.read_csv('seu_arquivo.csv')
+    if len(df) >= 5:
 
-    # Selecionando as características relevantes para a precificação
-    X = df[['Area', 'Quartos', 'Banheiros', 'Vagas', 'Bairro_Numerico', 'Classe_Numerica']]
+        # Total de imóveis
 
-    # Selecionando os preços correspondentes
-    y = df['Preco']
+        # Imóveis abaixo da média
 
-    # Dividir os dados em treino (70%) e o restante (30%)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        # Imóveis acima da média
 
-    # Criando e treinando o modelo de árvore de decisão
-    modelo = DecisionTreeRegressor(min_samples_leaf=5)
-    modelo.fit(X_train, y_train)
+        col1, col2, col3 = st.columns(3)
 
-    # Realizando a validação cruzada com 5 folds
-    scores = cross_val_score(modelo, X_test, y_test, cv=5, scoring='neg_mean_squared_error')
+        with col2:
+            st.metric('Total de Anúncios:', value = len(df))
 
-    # Convertendo os scores de erro para RMSE
-    rmse_scores = [sqrt(abs(score)) for score in scores]
+        with col1:
+            abaixo_media = len(df.loc[df.Preco<df["Preco"].mean()])
 
-    df['Previsão'] = modelo.predict(X).round(0)
+            st.metric('Abaixo da Média', value = abaixo_media, 
+                    delta = str(round(-abaixo_media*100/len(df),0)) + '%',
+                    delta_color='normal',)
 
-    df['Erro'] = df.Preco - df['Previsão']
+        with col3:    
+            acima_media = len(df.loc[df.Preco>df["Preco"].mean()])
 
-    df['Pessimista'] = round(((df['Previsão'] - df.Preco - np.mean(rmse_scores))/df.Preco)*100 , 0)
+            st.metric('Acima da Média', value = acima_media, 
+                    delta = str(round(acima_media*100/len(df),0)) + '%',
+                    delta_color='normal')
+                  
+        # Importar LabelEncoder do scikit-learn
+        from sklearn.preprocessing import LabelEncoder
 
-    df['Provável'] = round(((df['Previsão'] - df.Preco)/df.Preco)*100 , 0)
+        # Inicializar o codificador
+        le1 = LabelEncoder()
+        le2 = LabelEncoder()
 
-    df['Otimista'] = round(((df['Previsão'] - df.Preco + np.mean(rmse_scores))/df.Preco)*100 , 0)
+        # Ajustar o codificador aos bairros no DataFrame
+        df['Bairro_Numerico'] = le1.fit_transform(df['Bairro'])
+        df['Classe_Numerica'] = le2.fit_transform(df['Classe'])
 
-    # Total de imóveis
+        # Supondo que você tenha carregado sua base de dados em um DataFrame chamado 'dados'
+        # Exemplo:
+        # dados = pd.read_csv('seu_arquivo.csv')
 
-    # Imóveis abaixo da média
+        # Selecionando as características relevantes para a precificação
+        X = df[['Area', 'Quartos', 'Banheiros', 'Vagas', 'Bairro_Numerico', 'Classe_Numerica']]
 
-    # Imóveis acima da média
+        # Selecionando os preços correspondentes
+        y = df['Preco']
 
-    col1, col2, col3 = st.columns(3)
+        # Dividir os dados em treino (70%) e o restante (30%)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    with col2:
-        st.metric('Total de Anúncios:', value = len(df))
+        # Criando e treinando o modelo de árvore de decisão
+        modelo = DecisionTreeRegressor(min_samples_leaf=5)
+        modelo.fit(X_train, y_train)
 
-    with col1:
-        abaixo_media = len(df.loc[df.Preco<df["Preco"].mean()])
+        # Realizando a validação cruzada com 5 folds
+        scores = cross_val_score(modelo, X_test, y_test, cv=5, scoring='neg_mean_squared_error')
 
-        st.metric('Abaixo da Média', value = abaixo_media, 
-                delta = str(round(abaixo_media*100/len(df),0)) + '%',
-                delta_color='inverse',)
+        # Convertendo os scores de erro para RMSE
+        rmse_scores = [sqrt(abs(score)) for score in scores]
 
-    with col3:    
-        acima_media = len(df.loc[df.Preco>df["Preco"].mean()])
+        df['Previsão'] = modelo.predict(X).round(0)
 
-        st.metric('Acima da Média', value = acima_media, 
-                delta = str(round(acima_media*100/len(df),0)) + '%',
-                delta_color='normal')
+        df['Erro'] = df.Preco - df['Previsão']
 
-    # Exibir o resultado
-    col1, col2 = st.columns(2)
+        df['Pessimista'] = round(((df['Previsão'] - df.Preco - np.mean(rmse_scores))/df.Preco)*100 , 0)
 
-    import locale
-    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Define a localização para o Brasil
+        df['Provável'] = round(((df['Previsão'] - df.Preco)/df.Preco)*100 , 0)
 
-    with col1:
-        st.metric('Média de Preço:', value=f'R${locale.format("%.2f", df["Preco"].mean(), grouping=True)}')
-    with col2:
-        st.metric('Erro Médio (RMSE):', value=f'R${locale.format("%.2f", np.mean(rmse_scores), grouping=True)}')
+        df['Otimista'] = round(((df['Previsão'] - df.Preco + np.mean(rmse_scores))/df.Preco)*100 , 0)
 
-    st.write(df[['Link','Preco','Previsão','Erro','Pessimista', 'Provável','Otimista']])
+        # Exibir o resultado
+        col1, col2 = st.columns(2)
 
-    # Avaliando a importância de cada variável
-    importancias = modelo.feature_importances_
+        import locale
+        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Define a localização para o Brasil
 
-    # Criando os rótulos e valores para o gráfico de pizza
-    labels = [col.split('_')[0] for col in X.columns]
-    values = importancias
+        with col1:
+            st.metric('Média de Preço:', value=f'R${locale.format("%.2f", df["Preco"].mean(), grouping=True)}')
+        with col2:
+            st.metric('Erro Médio (RMSE):', value=f'R${locale.format("%.2f", np.mean(rmse_scores), grouping=True)}')
 
-    import plotly.graph_objects as go
+        df = df.sort_values(by='Provável', ascending=False)
+        df.reset_index(drop = True, inplace = True)
 
-    # Criando o gráfico de pizza
-    fig = go.Figure(data=[go.Bar(x=labels, y=values)])
+        st.write(df[['Link','Preco','Previsão','Erro','Pessimista', 'Provável','Otimista']])
 
-    # Personalizando o layout do gráfico
-    fig.update_layout(title='Importância das Variáveis',
-                    yaxis_range=[0, 1],
-                    width=700,
-                    height=500)
+        # Avaliando a importância de cada variável
+        importancias = modelo.feature_importances_
 
-    # Mostrando o gráfico no Streamlit
-    st.plotly_chart(fig)
+        # Criando os rótulos e valores para o gráfico de pizza
+        labels = [col.split('_')[0] for col in X.columns]
+        values = importancias*100
 
-    cols = st.columns(len(X.columns))
+        import plotly.graph_objects as go
 
-    for i in range(len(X.columns)):
-        with cols[i]:
-            st.metric(f'{labels[i]}:', value=round(importancias[i], 2))
+        # Criando o gráfico de pizza
+        fig = go.Figure(data=[go.Bar(x=labels, y=values)])
+
+        # Personalizando o layout do gráfico
+        fig.update_layout(title='Importância das Variáveis',
+                        yaxis_range=[0, 100],
+                        width=700,
+                        height=500)
+
+        # Mostrando o gráfico no Streamlit
+        st.plotly_chart(fig)
+
+        cols = st.columns(len(X.columns))
+
+        for i in range(len(X.columns)):
+            with cols[i]:
+                st.metric(f'{labels[i]}:', value=str(round(importancias[i]*100, 1))+"%")
+    else:
+        st.error('**Base de dados muito pequena para análise!**')
+        st.write('Por favor, aplique filtros que apresentem pelo menos 5 anúncios.')
 
 
 def main():
