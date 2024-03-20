@@ -44,7 +44,7 @@ def correlacao(filtered_df):
     st.pyplot(fig)
 
 
-def dispersao(filtered_df):
+def dispersao(df):
 
     import plotly.express as px
     import plotly.graph_objects as go
@@ -65,14 +65,14 @@ def dispersao(filtered_df):
     st.markdown('---')
 
     # Correlação
-    corr = filtered_df[x].corr(filtered_df[y])
+    corr = df[x].corr(df[y])
 
     # Exibir o resultado
     col1, col2 = st.columns(2)
     with col1:
         st.metric(f'Correlação linear entre {x} e {y}:',value = round(corr,2))  
-        st.metric(f'Total de anúncios:',value = len(filtered_df))  
-    
+        st.metric(f'Total de anúncios:',value = len(df))  
+
     with col2:
         # Exibir o indicador de acordo com o valor da correlação
         if corr > 0.7:
@@ -81,12 +81,12 @@ def dispersao(filtered_df):
             st.warning('Correlação Moderada')
         else:
             st.error('Correlação Fraca')
-    
+
     # Modelo de Regressão Linear
-    
+
     # Criando o modelo de regressão linear
-    X = filtered_df[[x]]
-    z = filtered_df[y]
+    X = df[[x]]
+    z = df[y]
     model = LinearRegression()
     model.fit(X, z)
 
@@ -94,15 +94,15 @@ def dispersao(filtered_df):
     predictions = model.predict(X)
 
     # Adicionando as previsões ao DataFrame
-    filtered_df['Previsões'] = predictions.round(0)
+    df['Previsões'] = predictions.round(0)
 
     # Calculando os erros (resíduos)
     errors = z - predictions
-    filtered_df['Erro do Modelo'] = errors.round(0)
-    filtered_df['ID'] = filtered_df.index
+    df['Erro do Modelo'] = errors.round(0)
+    df['ID'] = df.index
 
     # Criando o gráfico de dispersão com Plotly
-    fig = px.scatter(filtered_df, x=x, y=y, color=cor,
+    fig = px.scatter(df, x=x, y=y, color=cor,
                         title=f'Gráfico de Dispersão: {x} vs. {y}',
                         labels={
                             f'{x}': f'{x}', f'{y}': f'{y}'},
@@ -133,7 +133,7 @@ def dispersao(filtered_df):
     )
 
     # Adicionando a linha de regressão
-    fig.add_scatter(x=filtered_df[x], y=filtered_df['Previsões'],
+    fig.add_scatter(x=df[x], y=df['Previsões'],
                     mode='lines', name='Linha de Regressão',
                     line=dict(color='black', width=3))
 
@@ -143,13 +143,16 @@ def dispersao(filtered_df):
     id = st.number_input('ID:', step = 1)
     busca_id = st.button('Buscar por ID')
 
+    st.write(df['Erro do Modelo'].std())
+
     # Tabela com os dados
     if busca_id:
-        st.write(filtered_df[['Link', 'Area', 'Preco',
-            'Bairro', 'Previsões', 'Erro do Modelo']].loc[filtered_df.ID == id])
+        st.write(df[['Link', 'Area', 'Preco',
+            'Bairro', 'Previsões', 'Erro do Modelo']].loc[df.ID == id])
     else:
-        st.write(filtered_df[['Link', 'Area', 'Preco',
+        st.write(df[['Link', 'Area', 'Preco',
             'Bairro', 'Previsões', 'Erro do Modelo']])
+
 
 def medias(filtered_df):
 
@@ -287,23 +290,20 @@ def histogramas(filtered_df):
     # Organizando os gráficos na mesma linha
     st.plotly_chart(fig1, use_container_width=True)
 
-def oportunidades(filtered_df):
-    import pandas as pd
-    import numpy as np
-
+def oportunidades(df):
     # Importar LabelEncoder do scikit-learn
     from sklearn.preprocessing import LabelEncoder
 
     # Inicializar o codificador
-    le = LabelEncoder()
+    le1 = LabelEncoder()
+    le2 = LabelEncoder()
 
     # Ajustar o codificador aos bairros no DataFrame
-    filtered_df['Bairro_Numerico'] = le.fit_transform(filtered_df['Bairro'])
+    df['Bairro_Numerico'] = le1.fit_transform(df['Bairro'])
+    df['Classe_Numerica'] = le2.fit_transform(df['Classe'])
 
-    # Visualizar os mapeamentos de bairros para valores numéricos
-    mapeamento_bairros = dict(zip(le.classes_, le.transform(le.classes_)))
-
-
+    import pandas as pd
+    import numpy as np
     from sklearn.model_selection import train_test_split
     from sklearn.tree import DecisionTreeRegressor
     from sklearn.metrics import mean_squared_error
@@ -315,44 +315,98 @@ def oportunidades(filtered_df):
     # dados = pd.read_csv('seu_arquivo.csv')
 
     # Selecionando as características relevantes para a precificação
-    caracteristicas = filtered_df[['Area', 'Quartos', 'Banheiros', 'Vagas', 'Bairro_Numerico']]
+    X = df[['Area', 'Quartos', 'Banheiros', 'Vagas', 'Bairro_Numerico', 'Classe_Numerica']]
 
     # Selecionando os preços correspondentes
-    precos = filtered_df['Log_Preco']
+    y = df['Preco']
 
-    # Dividindo os dados em conjuntos de treinamento e teste
-    X_train, X_test, y_train, y_test = train_test_split(caracteristicas, precos, test_size=0.2, random_state=42)
+    # Dividir os dados em treino (70%) e o restante (30%)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Criando e treinando o modelo de árvore de decisão
-    modelo = DecisionTreeRegressor(min_samples_leaf=10)
+    modelo = DecisionTreeRegressor(min_samples_leaf=5)
     modelo.fit(X_train, y_train)
 
-    # Avaliando a importância de cada variável
-    importancias = modelo.feature_importances_
-
-    # Imprimindo a importância de cada variável
-    for i, coluna in enumerate(caracteristicas.columns):
-        print(f"Importância da variável {coluna}: {importancias[i]}")
-
     # Realizando a validação cruzada com 5 folds
-    scores = cross_val_score(modelo, caracteristicas, precos, cv=5, scoring='neg_mean_squared_error')
+    scores = cross_val_score(modelo, X_test, y_test, cv=5, scoring='neg_mean_squared_error')
 
     # Convertendo os scores de erro para RMSE
     rmse_scores = [sqrt(abs(score)) for score in scores]
 
-    # Imprimindo os scores de RMSE
-    print("Scores de RMSE: ", rmse_scores)
-    print("RMSE Médio: ", np.mean(rmse_scores))
+    df['Previsão'] = modelo.predict(X).round(0)
 
-    # Fazendo previsões
-    predictions = modelo.predict(X)
+    df['Erro'] = df.Preco - df['Previsão']
 
-    # Adicionando as previsões ao DataFrame
-    filtered_df['Previsões'] = predictions.round(0)
+    df['Pessimista'] = round(((df['Previsão'] - df.Preco - np.mean(rmse_scores))/df.Preco)*100 , 0)
 
-    # Calculando os erros (resíduos)
-    errors = filtered_df['Preco'] - predictions
-    filtered_df['Erro do Modelo'] = errors.round(0)
+    df['Provável'] = round(((df['Previsão'] - df.Preco)/df.Preco)*100 , 0)
+
+    df['Otimista'] = round(((df['Previsão'] - df.Preco + np.mean(rmse_scores))/df.Preco)*100 , 0)
+
+    # Total de imóveis
+
+    # Imóveis abaixo da média
+
+    # Imóveis acima da média
+
+    col1, col2, col3 = st.columns(3)
+
+    with col2:
+        st.metric('Total de Anúncios:', value = len(df))
+
+    with col1:
+        abaixo_media = len(df.loc[df.Preco<df["Preco"].mean()])
+
+        st.metric('Abaixo da Média', value = abaixo_media, 
+                delta = str(round(abaixo_media*100/len(df),0)) + '%',
+                delta_color='inverse',)
+
+    with col3:    
+        acima_media = len(df.loc[df.Preco>df["Preco"].mean()])
+
+        st.metric('Acima da Média', value = acima_media, 
+                delta = str(round(acima_media*100/len(df),0)) + '%',
+                delta_color='normal')
+
+    # Exibir o resultado
+    col1, col2 = st.columns(2)
+
+    import locale
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Define a localização para o Brasil
+
+    with col1:
+        st.metric('Média de Preço:', value=f'R${locale.format("%.2f", df["Preco"].mean(), grouping=True)}')
+    with col2:
+        st.metric('Erro Médio (RMSE):', value=f'R${locale.format("%.2f", np.mean(rmse_scores), grouping=True)}')
+
+    st.write(df[['Link','Preco','Previsão','Erro','Pessimista', 'Provável','Otimista']])
+
+    # Avaliando a importância de cada variável
+    importancias = modelo.feature_importances_
+
+    # Criando os rótulos e valores para o gráfico de pizza
+    labels = [col.split('_')[0] for col in X.columns]
+    values = importancias
+
+    import plotly.graph_objects as go
+
+    # Criando o gráfico de pizza
+    fig = go.Figure(data=[go.Bar(x=labels, y=values)])
+
+    # Personalizando o layout do gráfico
+    fig.update_layout(title='Importância das Variáveis',
+                    yaxis_range=[0, 1],
+                    width=700,
+                    height=500)
+
+    # Mostrando o gráfico no Streamlit
+    st.plotly_chart(fig)
+
+    cols = st.columns(len(X.columns))
+
+    for i in range(len(X.columns)):
+        with cols[i]:
+            st.metric(f'{labels[i]}:', value=round(importancias[i], 2))
 
 
 def main():
@@ -440,7 +494,7 @@ def main():
 
         with col2:
             max_area = st.number_input(
-                'Área máxima [m²]', min_value=min_area, value=200)
+                'Área máxima [m²]', min_value=min_area, value=1000)
 
         # Organizando os inputs na mesma linha
         col1, col2 = st.sidebar.columns(2)
@@ -451,7 +505,7 @@ def main():
 
         with col2:
             max_pm2 = st.number_input(
-                'Limite superior de Preço/m² [R$/m²]', min_value=min_pm2, value=40000)
+                'Limite superior de Preço/m² [R$/m²]', min_value=min_pm2, value=100000)
 
         # Organizando os inputs na mesma linha
         col1, col2 = st.sidebar.columns(2)
