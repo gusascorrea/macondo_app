@@ -10,3 +10,4 @@ seaborn
 matplotlib
 scipy
 scikit-learn
+locale
