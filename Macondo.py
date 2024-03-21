@@ -378,7 +378,9 @@ def oportunidades(df):
         with col1:
             st.metric('Média de Preço:', value=f'R${locale.format("%.2f", df["Preco"].mean(), grouping=True)}')
         with col2:
-            st.metric('Erro Médio (RMSE):', value=f'R${locale.format("%.2f", np.mean(rmse_scores), grouping=True)}')
+            st.metric('Raiz do Erro Quadrático Médio (RMSE):', 
+                      value=f'R${locale.format("%.2f", np.mean(rmse_scores), grouping=True)}',
+                      help='A Raiz do Erro Quadrático Médio (RMSE) é o desvio padrão dos valores residuais (erros de previsão).')
 
         df = df.sort_values(by='Provável', ascending=False)
         df.reset_index(drop = True, inplace = True)
