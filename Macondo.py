@@ -594,8 +594,7 @@ def main():
             oportunidades(filtered_df)            
         else:
             st.markdown('---')
-            st.subheader('Aplicativo designado à análise de anúncios de imóveis.')
-            st.write('')
-
-
+            st.write(r'"A ideia de um povo alegre, miscigenado, ordeiro, sem grandes problemas políticos, capaz de lidar com as desigualdades sociais e de gênero foi amplamente reproduzida no pensamento social"')
+            st.image('macondo.jpg',width=700)
+            st.write('---')
 main()
