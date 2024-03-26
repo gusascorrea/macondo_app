@@ -383,7 +383,6 @@ def oportunidades(df):
                       help='A Raiz do Erro Quadrático Médio (RMSE) é o desvio padrão dos valores residuais (erros de previsão).')
 
         df = df.sort_values(by='Provável', ascending=False)
-        df.reset_index(drop = True, inplace = True)
 
         st.write(df[['Link','Ativo','Dias Anunciado','Preco','Previsão','Erro','Pessimista', 'Provável','Otimista']])
 
