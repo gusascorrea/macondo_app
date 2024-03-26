@@ -385,7 +385,7 @@ def oportunidades(df):
         df = df.sort_values(by='Provável', ascending=False)
         df.reset_index(drop = True, inplace = True)
 
-        st.write(df[['Link','Preco','Previsão','Erro','Pessimista', 'Provável','Otimista']])
+        st.write(df[['Link','Ativo','Preco','Previsão','Erro','Pessimista', 'Provável','Otimista']])
 
         # Avaliando a importância de cada variável
         importancias = modelo.feature_importances_
