@@ -1,2 +1,2 @@
 chromium
-locales locales-all
+locales-all
