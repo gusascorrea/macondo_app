@@ -372,14 +372,14 @@ def oportunidades(df):
         # Exibir o resultado
         col1, col2 = st.columns(2)
 
-        import locale
-        locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Define a localização para o Brasil
+        mean_price = df['Preco'].mean()
 
         with col1:
-            st.metric('Média de Preço:', value=f'R${locale.format("%.2f", df["Preco"].mean(), grouping=True)}')
+            st.metric('Média de Preço:', value=fr'R${mean_price:.2f}')
         with col2:
+            rmse_mean = np.mean(rmse_scores)
             st.metric('Raiz do Erro Quadrático Médio (RMSE):', 
-                      value=f'R${locale.format("%.2f", np.mean(rmse_scores), grouping=True)}',
+                      value=f'R${rmse_mean:.2f}',
                       help='A Raiz do Erro Quadrático Médio (RMSE) é o desvio padrão dos valores residuais (erros de previsão).')
 
         df = df.sort_values(by='Provável', ascending=False)
