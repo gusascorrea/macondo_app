@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
+st.set_page_config(layout="wide")
 
 def segundos_para_hh_mm_ss(segundos_float):
     segundos = int(segundos_float)
