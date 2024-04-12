@@ -407,8 +407,7 @@ def oportunidades(df):
             # Exibir o resultado
             col1, col2 = st.columns(2)
             with col1:
-                st.metric(f'Correlação linear entre {x} e {y}:',value = round(corr,2))  
-                st.metric(f'Total de anúncios:',value = len(df))  
+                st.metric(f'Correlação linear entre {x} e {y}:',value = round(corr,2))   
 
             with col2:
                 # Exibir o indicador de acordo com o valor da correlação
