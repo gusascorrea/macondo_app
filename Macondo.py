@@ -384,7 +384,90 @@ def oportunidades(df):
 
         df = df.sort_values(by='Provável', ascending=False)
 
-        st.write(df[['Link','Ativo','Dias Anunciado','Preco','Previsão','Erro','Pessimista', 'Provável','Otimista']])
+        with st.expander('Dispersão'):
+            import plotly.express as px
+            import plotly.graph_objects as go
+            import seaborn as sns
+            import matplotlib.pyplot as plt
+            from sklearn.linear_model import LinearRegression
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                x = st.selectbox('Argumento X:', ['Area', 'Quartos','Banheiros', 'Vagas','Preco', 'Preco_por_m2', 'Log_Preco'])
+
+            with col2:
+                y = st.selectbox('Argumento Y:', ['Preco', 'Preco_por_m2', 'Log_Preco', 'Area', 'Quartos', 'Banheiros'])
+
+            st.markdown('---')
+
+            # Correlação
+            corr = df[x].corr(df[y])
+
+            # Exibir o resultado
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric(f'Correlação linear entre {x} e {y}:',value = round(corr,2))  
+                st.metric(f'Total de anúncios:',value = len(df))  
+
+            with col2:
+                # Exibir o indicador de acordo com o valor da correlação
+                if corr > 0.7:
+                    st.success('Correlação Forte')
+                elif 0.5 <= corr <= 0.7:
+                    st.warning('Correlação Moderada')
+                else:
+                    st.error('Correlação Fraca')
+
+            df['ID'] = df.index
+
+            # Criando o gráfico de dispersão com Plotly
+            fig = px.scatter(df, x=x, y=y, color='Erro',
+                                title=f'Gráfico de Dispersão: {x} vs. {y}',
+                                labels={
+                                    f'{x}': f'{x}', f'{y}': f'{y}'},
+                                hover_data={'ID': True,
+                                            'Descricao' : True},
+                                width=900, height=600)
+
+            # Adicionando texto de ID a cada ponto
+            #fig.update_traces(text='ID', hoverinfo='text')
+
+            # Adicionando texto de descrição a cada ponto
+            #fig.update_traces(text='Descricao', hoverinfo='text')
+
+            # Definindo a ação ao clicar no ponto
+            fig.update_traces(marker=dict(size=7))
+
+            # Aumentando o tamanho da fonte nos eixos x e y
+            fig.update_layout(
+                xaxis=dict(
+                    tickfont=dict(size=17)  # Define o tamanho da fonte no eixo x
+                ),
+                yaxis=dict(
+                    tickfont=dict(size=17)  # Define o tamanho da fonte no eixo y
+                ),
+                title=dict(
+                    font=dict(size=20)  # Define o tamanho da fonte no título
+                )
+            )
+
+            # Mostrando o gráfico no Streamlit
+            st.plotly_chart(fig)
+
+            id = st.number_input('ID:', step = 1)
+            busca_id = st.button('Buscar por ID')
+
+            # Tabela com os dados
+            if busca_id:
+                st.write(df[['Link','Ativo','Dias Anunciado','Area','Preco','Quartos','Banheiros',
+                     'Vagas','Previsão','Erro','Pessimista', 'Provável','Otimista']].loc[df.ID == id])
+            else:
+                st.write(df[['Link','Ativo','Dias Anunciado','Area','Preco','Quartos','Banheiros',
+                     'Vagas','Previsão','Erro','Pessimista', 'Provável','Otimista']])
+
+        st.write(df[['Link','Ativo','Dias Anunciado','Area','Preco','Quartos','Banheiros',
+                     'Vagas','Previsão','Erro','Pessimista', 'Provável','Otimista']])
 
         # Avaliando a importância de cada variável
         importancias = modelo.feature_importances_
